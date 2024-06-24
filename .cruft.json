@@ -1,0 +1,29 @@
+{
+  "template": "git@github.com:SigmaHQ/cookiecutter-pySigma-backend.git",
+  "commit": "19f0e7054dba700c493d351dd0a890b562c12441",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "target_name": "Quickwit",
+      "backend_package_name": "quickwit",
+      "backend_name": "Quickwit",
+      "backend_class_name": "QuickwitBackend",
+      "package_type": "backend",
+      "package_name": "pySigma-backend-quickwit",
+      "package_description": "pySigma Quickwit backend",
+      "author": "Alex Sinnott",
+      "email": "alex@sinn.io",
+      "license": "MIT",
+      "github_account": "sifex",
+      "test_badge": true,
+      "coverage_badge": true,
+      "coverage_gist": "GitHub Gist identifier containing coverage badge JSON expected by shields.io.",
+      "status_badge": true,
+      "status": "pre--release-orange",
+      "additional_output_formats": false,
+      "output_formats": "qwql",
+      "_template": "git@github.com:SigmaHQ/cookiecutter-pySigma-backend.git"
+    }
+  },
+  "directory": null
+}
