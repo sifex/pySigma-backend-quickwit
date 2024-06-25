@@ -11,7 +11,7 @@ from sigma.conversion.base import TextQueryBackend
 from sigma.types import SigmaCompareExpression, SigmaString
 from sigma.conversion.state import ConversionState
 from sigma.rule import SigmaRule
-from typing import ClassVar, Dict, Union, List, Any, Pattern
+from typing import ClassVar, Dict, Union, List, Any, Pattern, Tuple
 import re
 
 
@@ -24,7 +24,7 @@ class QuickwitBackend(TextQueryBackend):
     }
     requires_pipeline: bool = False
 
-    precedence: ClassVar[tuple[ConditionItem, ConditionItem, ConditionItem]] = (
+    precedence: ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (
         ConditionNOT,
         ConditionAND,
         ConditionOR,
@@ -46,7 +46,7 @@ class QuickwitBackend(TextQueryBackend):
 
     re_expression: ClassVar[str] = "{field}:/{regex}/"
     re_escape_char: ClassVar[str] = "\\"
-    re_escape: ClassVar[tuple[str]] = ("/",)
+    re_escape: ClassVar[Tuple[str]] = ("/",)
 
     compare_op_expression: ClassVar[str] = "{field}{operator}{value}"
     compare_operators: ClassVar[Dict[SigmaCompareExpression.CompareOperators, str]] = {
