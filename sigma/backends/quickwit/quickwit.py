@@ -1,6 +1,12 @@
 import ipaddress
 
-from sigma.conditions import ConditionItem, ConditionAND, ConditionOR, ConditionNOT, ConditionFieldEqualsValueExpression
+from sigma.conditions import (
+    ConditionItem,
+    ConditionAND,
+    ConditionOR,
+    ConditionNOT,
+    ConditionFieldEqualsValueExpression,
+)
 from sigma.conversion.base import TextQueryBackend
 from sigma.types import SigmaCompareExpression, SigmaRegularExpression, SigmaString
 from sigma.conversion.state import ConversionState
@@ -11,13 +17,18 @@ import re
 
 class QuickwitBackend(TextQueryBackend):
     """Quickwit backend."""
+
     name: ClassVar[str] = "Quickwit backend"
     formats: Dict[str, str] = {
         "default": "Plain Quickwit queries",
     }
     requires_pipeline: bool = False
 
-    precedence: ClassVar[tuple[ConditionItem, ConditionItem, ConditionItem]] = (ConditionNOT, ConditionAND, ConditionOR)
+    precedence: ClassVar[tuple[ConditionItem, ConditionItem, ConditionItem]] = (
+        ConditionNOT,
+        ConditionAND,
+        ConditionOR,
+    )
     group_expression: ClassVar[str] = "({expr})"
 
     token_separator: str = " "
@@ -61,17 +72,19 @@ class QuickwitBackend(TextQueryBackend):
     field_quote_pattern: ClassVar[Pattern] = re.compile("^\\w+$")
 
     def convert_condition_field_eq_val_str(self, cond: ConditionFieldEqualsValueExpression, state: ConversionState) -> \
-            Union[str, Any]:
+    Union[str, Any]:
         """Conversion of field = string value expressions"""
         field = self.escape_and_quote_field(cond.field)
-        if cond.value.startswith("*") and cond.value.endswith("*"):
-            return f'{field}:"*{self.convert_value_str(cond.value[1:-1], state)}*"'
-        elif cond.value.endswith("*"):
-            return f'{field}:"{self.convert_value_str(cond.value[:-1], state)}*"'
+        if cond.value == "*":  # Handle exists expression
+            return f"{field}:*"
+        elif cond.value.startswith("*") or cond.value.endswith("*"):  # Handle wildcards
+            return f'{field}:"{self.convert_value_str(cond.value, state)}"'
         else:
             return f'{field}:"{self.convert_value_str(cond.value, state)}"'
 
-    def convert_condition_or(self, cond: ConditionOR, state: ConversionState) -> Union[str, Any]:
+    def convert_condition_or(
+        self, cond: ConditionOR, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of OR conditions"""
         return f" {self.or_token} ".join(
             self.group_expression.format(expr=self.convert_condition(arg, state))
@@ -80,29 +93,35 @@ class QuickwitBackend(TextQueryBackend):
             for arg in cond.args
         )
 
-    def convert_condition_and(self, cond: ConditionAND, state: ConversionState) -> Union[str, Any]:
+    def convert_condition_and(
+        self, cond: ConditionAND, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of AND conditions"""
-        return f" {self.and_token} ".join(self.convert_condition(arg, state) for arg in cond.args)
+        return f" {self.and_token} ".join(
+            self.convert_condition(arg, state) for arg in cond.args
+        )
 
-    def convert_condition_field_eq_val_cidr(self, cond: ConditionFieldEqualsValueExpression, state: ConversionState) -> \
-            Union[str, Any]:
+    def convert_condition_field_eq_val_cidr(
+        self, cond: ConditionFieldEqualsValueExpression, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of CIDR expressions"""
         cidr = ipaddress.ip_network(cond.value.cidr)
         return f"{cond.field}:[{cidr.network_address} TO {cidr.broadcast_address}]"
 
     def escape_and_quote_field(self, field_name: str) -> str:
-        if self.field_quote is not None and self.field_quote_pattern is not None:
-            if self.field_quote_pattern.match(field_name) is None:
-                return f'{self.field_quote}{field_name}{self.field_quote}'
+        """Escape and quote field names if they contain spaces or special characters."""
+        if ' ' in field_name or any(char in field_name for char in '+-&|!(){}[]^"~*?:\\'):
+            return f'"{field_name}"'
         return field_name
 
-    def convert_condition_field_compare_op_val(self, cond: ConditionFieldEqualsValueExpression,
-                                               state: ConversionState) -> Union[str, Any]:
+    def convert_condition_field_compare_op_val(
+        self, cond: ConditionFieldEqualsValueExpression, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of field matches compare operation value expressions"""
         return self.compare_op_expression.format(
             field=cond.field + self.eq_token,
             operator=self.compare_operators[cond.value.op],
-            value=cond.value.number
+            value=cond.value.number,
         )
 
     def convert_value_str(self, value: SigmaString, state: ConversionState) -> str:
@@ -112,24 +131,34 @@ class QuickwitBackend(TextQueryBackend):
             self.wildcard_multi,
             self.wildcard_single,
             self.add_escaped,
-            self.filter_chars
+            self.filter_chars,
         )
         return converted
 
-    def convert_condition_as_in_expression(self, cond: Union[ConditionOR, ConditionAND], state: ConversionState) -> \
-            Union[str, Any]:
+    def convert_condition_as_in_expression(
+        self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of OR or AND conditions into in-expressions"""
         return self.field_in_list_expression.format(
             field=cond.args[0].field,
-            list=self.list_separator.join([self.convert_value_str(arg.value, state) for arg in cond.args])
+            list=self.list_separator.join(
+                [self.convert_value_str(arg.value, state) for arg in cond.args]
+            ),
         )
 
     def convert_condition_not(self, cond: ConditionNOT, state: ConversionState) -> Union[str, Any]:
         """Conversion of NOT conditions"""
-        return f"{self.not_token} {self.convert_condition(cond.args[0], state)}"
+        expr = self.convert_condition(cond.args[0], state)
+        return f"NOT {expr}"
 
-    def finalize_query(self, rule: SigmaRule, query: Any, index: int, state: ConversionState,
-                       output_format: str) -> Any:
+    def finalize_query(
+        self,
+        rule: SigmaRule,
+        query: Any,
+        index: int,
+        state: ConversionState,
+        output_format: str,
+    ) -> Any:
         """Finalize query by adding any necessary prefixes or suffixes."""
         return query
 
