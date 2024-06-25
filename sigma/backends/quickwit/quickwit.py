@@ -8,10 +8,10 @@ from sigma.conditions import (
     ConditionFieldEqualsValueExpression,
 )
 from sigma.conversion.base import TextQueryBackend
-from sigma.types import SigmaCompareExpression, SigmaRegularExpression, SigmaString
+from sigma.types import SigmaCompareExpression, SigmaString
 from sigma.conversion.state import ConversionState
 from sigma.rule import SigmaRule
-from typing import ClassVar, Dict, Optional, Union, List, Any, Pattern
+from typing import ClassVar, Dict, Union, List, Any, Pattern
 import re
 
 
@@ -71,8 +71,9 @@ class QuickwitBackend(TextQueryBackend):
     field_quote: ClassVar[str] = '"'
     field_quote_pattern: ClassVar[Pattern] = re.compile("^\\w+$")
 
-    def convert_condition_field_eq_val_str(self, cond: ConditionFieldEqualsValueExpression, state: ConversionState) -> \
-    Union[str, Any]:
+    def convert_condition_field_eq_val_str(
+        self, cond: ConditionFieldEqualsValueExpression, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of field = string value expressions"""
         field = self.escape_and_quote_field(cond.field)
         if cond.value == "*":  # Handle exists expression
@@ -110,7 +111,9 @@ class QuickwitBackend(TextQueryBackend):
 
     def escape_and_quote_field(self, field_name: str) -> str:
         """Escape and quote field names if they contain spaces or special characters."""
-        if ' ' in field_name or any(char in field_name for char in '+-&|!(){}[]^"~*?:\\'):
+        if " " in field_name or any(
+            char in field_name for char in '+-&|!(){}[]^"~*?:\\'
+        ):
             return f'"{field_name}"'
         return field_name
 
@@ -146,7 +149,9 @@ class QuickwitBackend(TextQueryBackend):
             ),
         )
 
-    def convert_condition_not(self, cond: ConditionNOT, state: ConversionState) -> Union[str, Any]:
+    def convert_condition_not(
+        self, cond: ConditionNOT, state: ConversionState
+    ) -> Union[str, Any]:
         """Conversion of NOT conditions"""
         expr = self.convert_condition(cond.args[0], state)
         return f"NOT {expr}"

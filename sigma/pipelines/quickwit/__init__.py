@@ -1,6 +1,5 @@
-from .quickwit import quickwit_pipeline
-# TODO: add all pipelines that should be exposed to the user of your backend in the import statement above.
+from .quickwit import quickwit_windows_pipeline
 
 pipelines = {
-    "quickwit_pipeline": quickwit_pipeline,  # TODO: adapt identifier to something approproiate
+    "quickwit_windows_pipeline": quickwit_windows_pipeline,
 }

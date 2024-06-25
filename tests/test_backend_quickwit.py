@@ -82,8 +82,8 @@ def test_quickwit_or_and_expression(quickwit_backend: QuickwitBackend):
                 condition: 1 of sel*
         """)
     ) == [
-               '(fieldA:"valueA1" AND fieldB:"valueB1") OR (fieldA:"valueA2" AND fieldB:"valueB2")'
-           ]
+        '(fieldA:"valueA1" AND fieldB:"valueB1") OR (fieldA:"valueA2" AND fieldB:"valueB2")'
+    ]
 
 
 def test_quickwit_in_expression(quickwit_backend: QuickwitBackend):
@@ -257,7 +257,6 @@ def test_quickwit_not_expression(quickwit_backend: QuickwitBackend):
     ) == ['fieldA:"valueA" AND NOT fieldB:"valueB"']
 
 
-
 def test_quickwit_exists_expression(quickwit_backend: QuickwitBackend):
     assert quickwit_backend.convert(
         SigmaCollection.from_yaml("""
@@ -271,7 +270,7 @@ def test_quickwit_exists_expression(quickwit_backend: QuickwitBackend):
                     fieldA: '*'
                 condition: sel
         """)
-    ) == ['fieldA:*']
+    ) == ["fieldA:*"]
 
 
 def test_quickwit_value_with_spaces(quickwit_backend: QuickwitBackend):
@@ -340,4 +339,4 @@ def test_quickwit_null_values(quickwit_backend: QuickwitBackend):
                     fieldA: null
                 condition: sel
         """)
-    ) == ['NOT fieldA:*']
+    ) == ["NOT fieldA:*"]

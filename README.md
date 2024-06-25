@@ -1,5 +1,5 @@
 ![Tests](https://github.com/sifex/pySigma-backend-quickwit/actions/workflows/test.yml/badge.svg)
-![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sifex/GitHub Gist identifier containing coverage badge JSON expected by shields.io./raw/sifex-pySigma-backend-quickwit.json)
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sifex/069da779c05d9acd68207eb3979e037a/raw/sifex-pySigma-backend-quickwit.json)
 ![Status](https://img.shields.io/badge/Status-pre--release-orange)
 
 # pySigma Quickwit Backend
