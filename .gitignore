@@ -6,3 +6,4 @@ cov.xml
 dist/
 docs/_build
 .idea/
+.ruff_cache/
