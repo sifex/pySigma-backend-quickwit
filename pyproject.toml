@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pySigma-backend-quickwit"
-version = "0.1.1"
+version = "0.1.4"
 description = "pySigma Quickwit backend"
 authors = ["Alex Sinnott <alex@sinn.io>"]
 license = "MIT"
