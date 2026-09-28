@@ -145,7 +145,14 @@ class QuickwitBackend(TextQueryBackend):
         return self.field_in_list_expression.format(
             field=cond.args[0].field,
             list=self.list_separator.join(
-                [self.convert_value_str(arg.value, state) for arg in cond.args]
+                [
+                    (
+                        self.convert_value_str(arg.value, state)
+                        if isinstance(arg.value, SigmaString)
+                        else str(arg.value)
+                    )
+                    for arg in cond.args
+                ]
             ),
         )
 

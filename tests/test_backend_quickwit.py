@@ -340,3 +340,21 @@ def test_quickwit_null_values(quickwit_backend: QuickwitBackend):
                 condition: sel
         """)
     ) == ["NOT fieldA:*"]
+
+
+def test_quickwit_in_expression_numbers(quickwit_backend: QuickwitBackend):
+    assert quickwit_backend.convert(
+        SigmaCollection.from_yaml("""
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                sel:
+                    fieldA:
+                        - 401
+                        - 403
+                condition: sel
+        """)
+    ) == ["fieldA:IN [401 403]"]
